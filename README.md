@@ -1,4 +1,4 @@
-![Logo: кошка Свинья](https://i.imgur.com/kZc0el8.png)
+![Logo: кошка Свинья](https://i.imgur.com/5AHvXQm.jpeg)
 
 # catpig
 
