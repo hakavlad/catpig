@@ -22,8 +22,8 @@ MAX_SPACE_MIB: int = (256 ** RND_CHUNK_SIZE - 1) // M
 def catpig(
     password: bytes,
     salt: bytes,
-    space_mib: int = 64,
-    passes: int = 4,
+    space_mib: int,
+    passes: int,
     dklen: int = 64
 ) -> bytes:
     """Memory-hard function.
