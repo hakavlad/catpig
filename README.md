@@ -11,13 +11,13 @@
 
 ## Install
 
-```
+```bash
 pip install catpig
 ```
 
 ## Usage
 
-```
+```python
 from catpig.catpig import catpig
 derived_key = catpig(password, salt, space_mib, passes, dklen=64)
 ```
@@ -32,7 +32,7 @@ derived_key = catpig(password, salt, space_mib, passes, dklen=64)
 
 ## Test vectors
 
-```
+```python
 >>> from catpig.catpig import catpig
 >>>
 >>> catpig(b'', b'', space_mib=1, passes=1, dklen=64).hex()
