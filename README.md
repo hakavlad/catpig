@@ -32,9 +32,9 @@ derived_key = catpig(password, salt, space_mib, passes, dklen=64)
 
 `space_mib` defines the memory usage in mebibytes.
 
-`passes` defines the amount of data that will be read and hashed by the `BLAKE2b` function. One pass corresponds to the `space_mib` size.
+`passes` defines the amount of data that will be read and hashed by the `BLAKE2b` function. One pass corresponds to reading a data size equal to `space_mib`.
 
-`dklen` is the length of the derived key.
+`dklen` is the length of the derived key in bytes.
 
 ## Test vectors
 
