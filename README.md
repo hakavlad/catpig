@@ -25,6 +25,7 @@ pip install catpig
 
 ```python
 from catpig.catpig import catpig
+
 derived_key = catpig(password, salt, space_mib, passes, dklen=64)
 ```
 
