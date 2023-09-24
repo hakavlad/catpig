@@ -8,8 +8,12 @@
 [![CodeQL](https://github.com/hakavlad/catpig/actions/workflows/codeql.yml/badge.svg)](https://github.com/hakavlad/catpig/actions/workflows/codeql.yml)
 
 `catpig` is a [memory-hard](https://en.wikipedia.org/wiki/Memory-hard_function) [key derivation function](https://en.wikipedia.org/wiki/Key_derivation_function).
+
 It uses `SHAKE256` to create data that will occupy memory of a given size (`space_mib`).
+
 The data will be read in 4096-byte chunks with a pseudo-random offset and hashed by the `BLAKE2b` function.
+
+Memory access patterns during reading of the first half of a given amount of data depend only on the salt (iMHF). Memory access patterns during reading of the second half of a given amount of data also depend the results of previous steps (dMHF).
 
 ## Install
 
