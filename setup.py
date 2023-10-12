@@ -7,7 +7,7 @@ def readme():
 
 
 NAME = 'catpig'
-VERSION = '0.2.0'
+VERSION = '0.3.0'
 
 setup(
     name=NAME,
@@ -15,7 +15,7 @@ setup(
     license='CC0',
     author='Alexey Avramov',
     author_email='hakavlad@gmail.com',
-    description='A memory-hard key derivation function',
+    description='A memory-hard password-hashing function',
     long_description=readme(),
     long_description_content_type='text/markdown',
     url='https://github.com/hakavlad/catpig',
@@ -32,7 +32,7 @@ setup(
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    keywords='kdf',
+    keywords='kdf', 'pbkdf', 'memory-hard',
     project_urls={
         'Homepage': 'https://github.com/hakavlad/catpig',
         'Bug Tracker': 'https://github.com/hakavlad/catpig/issues',
