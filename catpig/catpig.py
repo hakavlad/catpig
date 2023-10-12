@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""catpig memory-hard KDF.
+"""The catpig memory-hard password-hashing function.
 """
 
-from hashlib import blake2b, pbkdf2_hmac, shake_256
+from hashlib import blake2b, shake_256
 
 K: int = 2 ** 10
 M: int = 2 ** 20
@@ -15,7 +15,6 @@ NUM_CHUNKS_IN_READ_BLOCK: int = READ_BLOCK_SIZE // READ_CHUNK_SIZE
 NUM_READ_BLOCKS_IN_MIB: int = M // READ_BLOCK_SIZE
 RND_BLOCK_SIZE: int = RND_CHUNK_SIZE * NUM_CHUNKS_IN_READ_BLOCK + SHAKE_SIZE
 MAX_SPACE_BLOCK_SIZE: int = (2 ** 31 - 1) // M
-MAX_DKLEN: int = 2 ** 31 - 1
 MAX_SPACE_MIB: int = (256 ** RND_CHUNK_SIZE - 1) // M
 
 
@@ -23,19 +22,15 @@ def catpig(
     password: bytes,
     salt: bytes,
     space_mib: int,
-    passes: int,
-    dklen: int = 64
+    passes: int
 ) -> bytes:
-    """Memory-hard function.
+    """Memory-hard password-hashing function.
     """
     if space_mib < 1 or space_mib > MAX_SPACE_MIB:
         raise ValueError('Invalid space_mib value')
 
     if passes < 1:
         raise ValueError('Invalid passes value')
-
-    if dklen < 1 or dklen > MAX_DKLEN:
-        raise ValueError('Invalid dklen value')
 
     space_size: int = space_mib * M
     num_read_blocks: int = NUM_READ_BLOCKS_IN_MIB * space_mib * passes
@@ -49,13 +44,16 @@ def catpig(
     ho_blake.update(salt)
     salt64: bytes = ho_blake.digest()
 
-    ho_passes = blake2b(key=key64)
+    ho_passes = blake2b()
+    ho_passes.update(key64)
     ho_passes.update(salt64)
 
-    passes_digest0: bytes = ho_passes.digest()
-
     ho_space = shake_256()
-    ho_space.update(passes_digest0)
+    ho_space.update(key64)
+    ho_space.update(salt64)
+
+    ho_mem_access_pattern = shake_256()
+    ho_mem_access_pattern.update(salt64)
 
     num_space_blocks: int = space_size // MAX_SPACE_BLOCK_SIZE
     rem_space_size: int = space_size % MAX_SPACE_BLOCK_SIZE
@@ -66,12 +64,10 @@ def catpig(
         space_block: bytes = ho_space.digest(MAX_SPACE_BLOCK_SIZE)
         space_block_list.append(space_block)
         ho_space.update(space_block[-SHAKE_SIZE:])
+
     if rem_space_size > 0:
         space_block = ho_space.digest(rem_space_size)
         space_block_list.append(space_block)
-
-    ho_mem_access_pattern = shake_256()
-    ho_mem_access_pattern.update(salt64)
 
     for i in range(num_read_blocks):
         rnd_block: bytes = ho_mem_access_pattern.digest(RND_BLOCK_SIZE)
@@ -114,14 +110,6 @@ def catpig(
             passes_intermediate_digest = ho_passes.digest()
             ho_mem_access_pattern.update(passes_intermediate_digest)
 
-    passes_final_digest: bytes = ho_passes.digest()
-
-    derived_key: bytes = pbkdf2_hmac(
-        hash_name='sha3_512',
-        iterations=K,
-        password=passes_final_digest,
-        salt=salt64,
-        dklen=dklen
-    )
+    derived_key: bytes = ho_passes.digest()
 
     return derived_key
