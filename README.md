@@ -7,13 +7,15 @@
 [![PyPI](https://img.shields.io/pypi/v/catpig?color=blue&label=PyPI)](https://pypi.org/project/catpig/)
 [![CodeQL](https://github.com/hakavlad/catpig/actions/workflows/codeql.yml/badge.svg)](https://github.com/hakavlad/catpig/actions/workflows/codeql.yml)
 
-`catpig` is a [memory-hard](https://en.wikipedia.org/wiki/Memory-hard_function) [key derivation function](https://en.wikipedia.org/wiki/Key_derivation_function).
+`catpig` is a [memory-hard](https://en.wikipedia.org/wiki/Memory-hard_function) [password-hashing function](https://en.wikipedia.org/wiki/Key_derivation_function).
 
 It uses `SHAKE256` to create data that will occupy memory of a given size (`space_mib`).
 
 The data will be read in 4096-byte chunks with a pseudo-random offset and hashed by the `BLAKE2b` function.
 
 Memory access patterns during reading of the first half of a given amount of data depend only on the salt (iMHF). Memory access patterns during reading of the second half of a given amount of data also depend the results of previous steps (dMHF).
+
+Output length is always 64 bytes.
 
 ## Install
 
@@ -26,7 +28,7 @@ pip install catpig
 ```python
 from catpig.catpig import catpig
 
-derived_key = catpig(password, salt, space_mib, passes, dklen=64)
+derived_key = catpig(password, salt, space_mib, passes)
 ```
 
 `password` and `salt` must be bytes-like objects.
@@ -35,24 +37,22 @@ derived_key = catpig(password, salt, space_mib, passes, dklen=64)
 
 `passes` defines the amount of data that will be read and hashed by the `BLAKE2b` function. One pass corresponds to reading a data size equal to `space_mib`.
 
-`dklen` is the length of the derived key in bytes.
-
 ## Test vectors
 
 ```python
 >>> from catpig.catpig import catpig
 >>>
->>> catpig(b'', b'', space_mib=1, passes=1, dklen=64).hex()
-'d7353e5679fae8c0ade683d093e449f314e98b744b08f5e05393450979c52fb579ecead60b27190f9facc3b40422ab87a75cdb706db02e3024d7469954a2b954'
+>>> catpig(b'', b'', space_mib=1, passes=1).hex()
+'831e43e4a352066a8ade279225d95e7543203cce8ce77348e4f7898741f32b9f1b8793393aa69cef84016d5f391aa9a7840050c5c59b9defd6cc324cb44e3e9a'
 >>>
 >>> catpig(password=b'password', salt=b'salt', space_mib=64, passes=4).hex()
-'79826615260804f0a114f5689225b2fc72e90d9b367d5bff9ba86b9adc94e71b5f55b31f098247cdc12f6ee32055bedf37454ff7cc47367096293f6b38737fb4'
+'d1999b1a7749de88ac8b6f1d8659ccf3b1c2cfe7fd84426bddc75de4b9f57bc07293cca52bb22e0915945d462bb760dfab02d78a713e65620307bc08b8fb7905'
 >>>
 >>> catpig(password=b'passphrase', salt=b'NaCl', space_mib=512, passes=8).hex()
-'9f842ee90b2bb079dc88e867cff3184e17d8c35ecc6042cc2cbce1128af34fe764f1ffeff542fcb56cee6a4ef12a2393e96be5cd8baeeb109729a82a060e1794'
+'83b6181449eb405e7bb662642090c077298e445f63846a98f18b8102df5e80f8a50dcf43f951ce8e893aac5beb23d33e5282624fd288fac4d07b8647f6c9bffe'
 >>>
 >>> catpig(password=b'new_passphrase', salt=b'SodiumChloride', space_mib=5000, passes=15).hex()
-'5c2a79e4f0b69e00b3676e9c7b1a3159bc77c5153b1e88bed6fbae1497143caeb4d901a65324f496461eeb4c72b6a6cb9938c7be04aee33abd4dd83fa3306d57'
+'b4f96ceddf5c46380f6a425ebf2a30372cccfb3e4d7d95fd1cfc7c64910142eca3b7e61c20e32db7c97c72230c3b63abf1802dc068513297b67c274267fd1dde'
 ```
 
 ## Warnings
