@@ -15,7 +15,7 @@ The data will be read in 4096-byte chunks with a pseudo-random offset and hashed
 
 Memory access patterns during reading of the first half of a given amount of data depend only on the salt (iMHF). Memory access patterns during reading of the second half of a given amount of data also depend the results of previous steps (dMHF).
 
-Output length is always 64 bytes.
+The output length is always 64 bytes.
 
 ## Install
 
